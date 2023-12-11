@@ -1,0 +1,10 @@
+[Unit]
+Description=Checks every 5 seconds for changes in /var/www/uploads, and runs start_handler.sh
+
+[Service]
+Type=simple
+ExecStart=/etc/ansible/handler/start_handler.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

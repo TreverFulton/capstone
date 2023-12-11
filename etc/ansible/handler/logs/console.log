@@ -1,0 +1,183 @@
+
+PLAY [Initialize a custom Vagrant environment] *********************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [192.168.0.253]
+
+TASK [Update package cache] ****************************************************
+changed: [192.168.0.253]
+
+TASK [Gathering package facts] *************************************************
+ok: [192.168.0.253]
+
+TASK [Install Vagrant] *********************************************************
+ok: [192.168.0.253]
+
+TASK [Check if setup directory exists] *****************************************
+ok: [192.168.0.253]
+
+TASK [Create setup directory if doesn't exist] *********************************
+changed: [192.168.0.253]
+
+TASK [Gather Package facts] ****************************************************
+ok: [192.168.0.253]
+
+TASK [Add Virtualbox Repos if Vbox isn't installed] ****************************
+skipping: [192.168.0.253] => (item=deb https://fasttrack.debian.net/debian-fasttrack /bookworm-fasttrack main contrib) 
+skipping: [192.168.0.253] => (item=deb https://fasttrack.debian.net/debian-fasttrack /bookworm-backports-staging main contrib) 
+skipping: [192.168.0.253]
+
+TASK [Update apt-cache if Vbox wasn't found] ***********************************
+skipping: [192.168.0.253]
+
+TASK [Install VirtualBox and VirtualBox-ext-pack if not found] *****************
+skipping: [192.168.0.253]
+
+TASK [Copy SSH key from ansible node to Vagrant host] **************************
+changed: [192.168.0.253]
+
+PLAY RECAP *********************************************************************
+192.168.0.253              : ok=8    changed=3    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0   
+
+
+PLAY [Create Alpine VM with Vagrant] *******************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [192.168.0.253]
+
+TASK [Check if vagrant directory exists] ***************************************
+ok: [192.168.0.253]
+
+TASK [Create directory if it doesn't exist] ************************************
+changed: [192.168.0.253]
+
+TASK [Create setup.sh script to run on start] **********************************
+changed: [192.168.0.253]
+
+TASK [Create Vagrantfile for VM] ***********************************************
+changed: [192.168.0.253]
+
+TASK [Create and provision the Vagrant VM] *************************************
+changed: [192.168.0.253]
+
+PLAY RECAP *********************************************************************
+192.168.0.253              : ok=6    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+
+PLAY [Install Nginx] ***********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [192.168.0.201]
+
+TASK [Update apk package cache] ************************************************
+changed: [192.168.0.201]
+
+TASK [Install nginx package] ***************************************************
+changed: [192.168.0.201]
+
+TASK [Install php82 package] ***************************************************
+changed: [192.168.0.201]
+
+TASK [Install php82-fpm] *******************************************************
+changed: [192.168.0.201]
+
+TASK [Install php82-session] ***************************************************
+changed: [192.168.0.201]
+
+TASK [Install php82-mysqli] ****************************************************
+changed: [192.168.0.201]
+
+TASK [Create /var/www/html/ directory recursively] *****************************
+changed: [192.168.0.201]
+
+TASK [Extract the copied over HTML files] **************************************
+changed: [192.168.0.201]
+
+TASK [Copy Current Nginx config to VM] *****************************************
+changed: [192.168.0.201]
+
+TASK [Start Nginx Service] *****************************************************
+changed: [192.168.0.201]
+
+TASK [Start php-fpm82 Service] *************************************************
+changed: [192.168.0.201]
+
+PLAY RECAP *********************************************************************
+192.168.0.201              : ok=12   changed=11   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+
+PLAY [Create Alpine VM with Vagrant] *******************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [192.168.0.253]
+
+TASK [Check if vagrant directory exists] ***************************************
+ok: [192.168.0.253]
+
+TASK [Create directory if it doesn't exist] ************************************
+changed: [192.168.0.253]
+
+TASK [Create setup.sh script to run on start] **********************************
+changed: [192.168.0.253]
+
+TASK [Create Vagrantfile for VM] ***********************************************
+changed: [192.168.0.253]
+
+TASK [Create and provision the Vagrant VM] *************************************
+changed: [192.168.0.253]
+
+PLAY RECAP *********************************************************************
+192.168.0.253              : ok=6    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+
+PLAY [Build a MariaDB Database] ************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [192.168.0.202]
+
+TASK [Update apk package cache] ************************************************
+changed: [192.168.0.202]
+
+TASK [Install mariadb package] *************************************************
+changed: [192.168.0.202]
+
+TASK [Install mariadb-client package] ******************************************
+changed: [192.168.0.202]
+
+TASK [Install dependancy py3-pymysql] ******************************************
+changed: [192.168.0.202]
+
+TASK [check if Mariadb is already initialized] *********************************
+ok: [192.168.0.202]
+
+TASK [Initialize Mariadb] ******************************************************
+changed: [192.168.0.202]
+
+TASK [Change mariadb config to listen for network connections on all interfaces] ***
+changed: [192.168.0.202]
+
+TASK [Run mariadb service] *****************************************************
+changed: [192.168.0.202]
+
+TASK [Create database_files directory in /tmp/] ********************************
+changed: [192.168.0.202]
+
+TASK [Extract database files in folder] ****************************************
+changed: [192.168.0.202]
+
+TASK [Upload SQL files to the Database] ****************************************
+changed: [192.168.0.202]
+
+TASK [drops local anonymous user that prevents localhost login] ****************
+changed: [192.168.0.202]
+
+PLAY RECAP *********************************************************************
+192.168.0.202              : ok=13   changed=11   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+generated host file
+Ansible playbook executed successfully!
+Ansible playbook executed successfully!
+Ansible playbook executed successfully!
+Ansible playbook executed successfully!
+Ansible playbook executed successfully!
+handler.py completed successfully

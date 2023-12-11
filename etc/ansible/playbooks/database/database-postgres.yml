@@ -1,0 +1,84 @@
+---
+- name: Build a Postgresql Database
+  hosts: db
+  vars:
+    db_user: dbusername
+    db_name: mydatabase
+    db_password: dbpass
+
+  tasks:
+  - name: Update apk package cache
+    apk:
+      update_cache: yes
+
+  - name: Install Dependency py3-psycopg2
+    apk:
+      name: py3-psycopg2
+      state: present
+
+  - name: Install Dependency libpq-dev
+    apk:
+      name: libpq-dev
+      state: present
+
+  - name: Install postgresql package
+    apk:
+      name: postgresql
+      state: present
+
+  - name: Install postgresql-contrib package
+    apk:
+      name: postgresql-contrib
+      state: present
+
+  - name: Run PosgreSQL service
+    service:
+      name: postgresql
+      state: started
+      enabled: yes
+
+  - name: Create a Database
+    become: true
+    become_user: postgres
+    postgresql_db:
+      name: "{{db_name}}"
+      template: 'template0'
+      state: present
+
+  - name: Create a User for the Database
+    become: true
+    become_user: postgres
+    postgresql_user:
+      name: "{{db_user}}"
+      password: "{{db_password}}"
+      state: present
+
+  - name: Modify Database user roles
+    become: true
+    become_user: postgres
+    postgresql_user:
+      name: "{{db_user}}"
+      role_attr_flags: SUPERUSER
+      state: present
+
+  - name: Create database_files directory in /tmp/
+    become: true
+    file:
+      path: /tmp/database_files
+      state: directory
+      mode: 0755
+
+  - name: Copy over SQL files to VM
+    become: true
+    copy:
+      src: /tmp/database_files/
+      dest: /tmp/database_files/
+
+  - name: Upload SQL files to the Database
+    become: true
+    become_user: postgres
+    shell: >
+      for file in /tmp/database_files/*.sql; do
+        psql -U "{{db_user}}" -d "{{db_name}}" -f "$file"
+      done
+

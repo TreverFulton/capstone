@@ -1,0 +1,52 @@
+---
+- name: Create Alpine VM with Vagrant
+  hosts: vagrant
+  gather_facts: yes
+  tasks:
+
+    - name: Check if vagrant directory exists
+      stat:
+        path: /etc/vagrant/{{hostname}}
+      register: dir_check
+
+    - name: Create directory if it doesn't exist
+      file:
+        path: /etc/vagrant/{{hostname}}
+        state: directory
+      when: not dir_check.stat.exists
+
+    - name: Create setup.sh script to run on start
+      copy:
+        content: |
+          #!/bin/bash
+          echo "root:{{root_password}}" | chpasswd
+          adduser -D -h /home/{{username}} -s /bin/bash {{username}}
+          echo "{{username}}:{{password}}" | chpasswd
+          mkdir /root/.ssh/
+          cp /tmp/ansible.pub /root/.ssh/authorized_keys
+          apk update
+          apk add python3
+          apk add unzip
+        dest: /etc/vagrant/{{hostname}}/setup.sh
+
+
+    - name: Create Vagrantfile for VM
+      copy:
+        content: |
+          Vagrant.configure("2") do |config|
+            config.vm.box = "generic/alpine318"
+            config.vm.network "public_network", type: "static", ip: "{{ip}}", bridge: "wlp1s0"
+            config.vm.hostname =  "{{hostname}}"
+            config.vm.provider "virtualbox" do |vb|
+              vb.memory = "512"
+              vb.cpus = 1
+            end
+            config.vm.provision "file", source: "/etc/vagrant/setup/id_rsa.pub", destination: "/tmp/ansible.pub"
+            config.vm.provision "shell", path: "/etc/vagrant/{{hostname}}/setup.sh"
+          end
+        dest: /etc/vagrant/{{hostname}}/Vagrantfile
+
+    - name: Create and provision the Vagrant VM
+      command: vagrant up
+      args:
+        chdir: /etc/vagrant/{{hostname}}/

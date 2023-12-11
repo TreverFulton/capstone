@@ -1,0 +1,65 @@
+---
+- name: Build a MariaDB Database
+  hosts: "{{ip}}"
+
+  tasks:
+  - name: Update apk package cache
+    apk:
+      update_cache: yes
+
+  - name: Install mariadb package
+    apk:
+      name: mariadb
+      state: present
+
+  - name: Install mariadb-client package
+    apk:
+      name: mariadb-client
+      state: present
+
+  - name: Install dependancy py3-pymysql
+    apk:
+      name: py3-pymysql
+      state: present
+
+  - name: check if Mariadb is already initialized
+    stat:
+      path: /var/lib/mysql/ibdata1
+    register: db_setup_check #intialized over initialized environment will break playbook
+
+  - name: Initialize Mariadb
+    shell: /etc/init.d/mariadb setup
+    when: not db_setup_check.stat.exists
+
+  - name: Change mariadb config to listen for network connections on all interfaces
+    shell: sed -i -e '/^\[mysqld\]$/,/^$/ s/^skip-networking$/bind-address=0.0.0.0\n#skip-networking/' "/etc/my.cnf.d/mariadb-server.cnf"
+
+  - name: Run mariadb service
+    service:
+      name: mariadb
+      state: started
+      enabled: yes
+
+  - name: Create database_files directory in /tmp/
+    become: true
+    file:
+      path: /tmp/database_files
+      state: directory
+      mode: 0755
+
+  - name: Extract database files in folder
+    become: true
+    unarchive:
+      src: "/var/www/uploads/{{file}}"
+      dest: "/tmp/database_files/"
+    when: file is defined and file != ''
+
+  - name: Upload SQL files to the Database
+    shell: >
+      for file in /tmp/database_files/*.sql; do
+        mariadb <  "$file"
+      done
+    when: file is defined and file !=''
+
+  - name: drops local anonymous user that prevents localhost login
+    shell: mariadb -e "DROP USER ''@'localhost';"

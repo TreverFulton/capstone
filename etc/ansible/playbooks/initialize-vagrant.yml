@@ -1,0 +1,66 @@
+---
+- name: Initialize a custom Vagrant environment
+  hosts: vagrant
+  gather_facts: yes
+  tasks:
+
+    - name: Update package cache
+      apt:
+        update_cache: yes
+
+    - name: Gathering package facts
+      package_facts:
+        manager: auto
+
+    - name: Install Vagrant
+      apt:
+        name: vagrant
+
+    - name: Check if setup directory exists
+      stat:
+        path: /etc/vagrant/setup
+      register: dir_check
+
+    - name: Create setup directory if doesn't exist
+      file:
+        path: /etc/vagrant/setup
+        state: directory
+        recurse: yes
+      when: not dir_check.stat.exists
+
+    - name: Gather Package facts
+      package_facts:
+        manager: auto
+
+    - name: Add Virtualbox Repos if Vbox isn't installed
+      become: true
+      lineinfile:
+        path: /etc/apt/sources.list
+        line: "{{ item }}"
+        create: yes
+      with_items:
+      - "deb https://fasttrack.debian.net/debian-fasttrack /bookworm-fasttrack main contrib"
+      - "deb https://fasttrack.debian.net/debian-fasttrack /bookworm-backports-staging main contrib"
+      when: "'virtualbox' not in ansible_facts.packages"
+
+
+    - name: Update apt-cache if Vbox wasn't found
+      become: true
+      apt:
+        update_cache: yes
+      when: "'virtualbox' not in ansible_facts.packages"
+
+
+    - name: Install VirtualBox and VirtualBox-ext-pack if not found
+      become: true
+      apk:
+        name: ['virtualbox', 'virtualbox-ext-pack']
+      when: "'virtualbox' not in ansible_facts.packages"
+
+
+    - name: Copy SSH key from ansible node to Vagrant host
+      copy:
+        src: "/root/.ssh/id_rsa.pub"
+        dest: "/etc/vagrant/setup/"
+        owner: root
+        mode: "0644"

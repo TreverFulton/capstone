@@ -1,0 +1,47 @@
+---
+- name: Build a Postgresql Database
+  hosts: db
+  vars:
+    db_user: dbusername
+    db_name: mydatabase
+    db_password: dbpass
+
+  tasks:
+
+  - name: Create a Database
+    become: true
+    mysql_db:
+      name: "{{db_name}}"
+      state: present
+
+  - name: Create a User for the Database
+    mysql_user:
+      name: "{{db_user}}"
+      password: "{{db_password}}"
+      state: present
+
+  - name: Modify Database user roles
+    mysql_user:
+      name: "{{db_user}}"
+      role_attr_flags: SUPERUSER
+      state: present
+
+  - name: Create database_files directory in /tmp/
+    become: true
+    file:
+      path: /tmp/database_files
+      state: directory
+      mode: 0755
+
+  - name: Copy over SQL files to VM
+    become: true
+    copy:
+      src: /tmp/database_files/
+      dest: /tmp/database_files/
+
+  - name: Upload SQL files to the Database
+    shell: >
+      for file in /tmp/database_files/*.sql; do
+        mariadb <  "$file"
+      done
+

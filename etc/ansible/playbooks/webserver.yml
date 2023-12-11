@@ -1,0 +1,66 @@
+---
+- name: Install Nginx
+  hosts: "{{ip}}"
+  become: yes
+
+  tasks:
+    - name: Update apk package cache
+      apk:
+        update_cache: yes
+
+    - name: Install nginx package
+      package:
+        name: nginx
+        state: present
+
+    - name: Install php82 package
+      package:
+        name: php82
+        state: present
+
+    - name: Install php82-fpm
+      package:
+        name: php82-fpm
+        state: present
+
+    - name: Install php82-session
+      package:
+        name: php82-session
+        state: present
+
+    - name: Install php82-mysqli
+      package:
+        name: php82-mysqli
+        state: present
+
+    - name: Create /var/www/html/ directory recursively
+      file:
+        path: "/var/www/html"
+        state: directory
+        mode: "0755"
+        recurse: yes
+
+    - name: Extract the copied over HTML files
+      become: true
+      unarchive:
+        src: "/var/www/uploads/{{file}}"
+        dest: "/var/www/html/"
+      when: file is defined and file != ''
+
+    - name: Copy Current Nginx config to VM
+      copy:
+        src: /etc/ansible/setup/nginx.conf
+        dest: /etc/nginx/http.d/default.conf
+
+    - name: Start Nginx Service
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Start php-fpm82 Service
+      service:
+        name: php-fpm82
+        state: started
+        enabled: yes
+
