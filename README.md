@@ -6,9 +6,7 @@ This project is an implementation of a simple web interface that allows a user t
 ![Image](https://github.com/TreverFulton/capstone/blob/main/Documentation/Capstone%20Video.drawio.png)
 
 ## Video Demonstration
-[![Video](https://img.youtube.com/vi/l5CIfqJ5yQM/maxresdefault.jpg)](www.youtube.com/watch?v=l5CIfqJ5yQM)
-
-
+[![Video](https://img.youtube.com/vi/l5CIfqJ5yQM/maxresdefault.jpg)](https://www.youtube.com/watch?v=l5CIfqJ5yQM)
 
 ## Technologies Implemented: 
 * Ansible
